@@ -1,31 +1,38 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const [apiUrl, setApiUrl] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const validApi = "https://r2tcz6zsokynb72jb6o4ffd5nm0ryfyz.lambda-url.us-west-2.on.aws/"; // Essa é a UNICA api válida
+  const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => { // Atualiza o valor da URL da API
     setApiUrl(e.target.value);
     setError("");
   };
 
   const handleSubmit = async () => {
     if (apiUrl.trim() === "") {
-      setError("Por favor, insira a URL da API");
+      setError("Por favor, insira a URL da API"); // URL vazia
+      return;
+    }
+
+    if (apiUrl.trim() !== validApi) {
+      setError("Endpoint inválido. Use a URL correta."); // URL incorreta (nem api é)
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/`);
-      if (!response.ok) {
-        throw new Error();
-      }
+      const formattedApiUrl = apiUrl.trim().replace(/\/$/, ""); // Remove a barra final, se houver
+      const response = await fetch(`${formattedApiUrl}/`); // Usa a URL sem a barra final, se não, não funciona
+      if (!response.ok) throw new Error();
       setError("");
-      console.log("URL da API:", apiUrl);
+      navigate("/conta"); // Redireciona para a próxima tela
     } catch {
-      setError("Não foi possível conectar com esse endpoint.");
+      setError("Não foi possível conectar com esse endpoint."); // URL incorreta
     } finally {
       setLoading(false);
     }
@@ -36,16 +43,16 @@ function App() {
       <img
         src="/DevBankLogo.png"
         alt="Logo DevBank"
-        className="object-cover flex w-300 mb-10"
+        className="object-cover flex w-300 mb-10" // Logo
       />
       <input
         type="text"
         value={apiUrl}
         onChange={handleChange}
-        placeholder="Coloque aqui o endpoint da sua API"
+        placeholder="Coloque aqui o endpoint da sua API" // Caixa de texto
         className="text-white border text-2xl border-teal-300 rounded-2xl px-4 py-2 w-220 h-20"
       />
-      {error && <p className="text-red-500 text-sm -mt-2">{error}</p>}
+      {error && <p className="text-red-500 text-sm -mt-2">{error}</p>} {/* Mensagem de erro */}
       <button
         onClick={handleSubmit}
         disabled={loading}
@@ -53,10 +60,10 @@ function App() {
           loading ? "opacity-50 cursor-not-allowed" : ""
         }`}
       >
-        {loading ? "Verificando..." : "Entrar"}
+        {loading ? "Verificando..." : "Entrar"} {/* Botão de entrar */}
       </button>
     </div>
   );
 }
 
-export default App;
+export default App; // Componente da conta do DevBank
