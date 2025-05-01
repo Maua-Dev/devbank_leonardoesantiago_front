@@ -58,9 +58,6 @@ function Depositar() {
         alt="Logo DevBank"
         className="absolute top-4 left-4 object-cover flex w-100 mb-10"
       />
-      <h1 className="text-white text-5xl mb-4 font-bold absolute top-11 left-1/2 transform -translate-x-1/2">
-        Selecione as quantidades de notas para depósito
-      </h1>
 
       <div className="flex justify-between items-center bg-gray-800 border border-teal-300 rounded-2xl p-6 text-white text-3xl mb-5 w-full max-w-lg">
         <span>Saldo atual:</span>
@@ -92,16 +89,25 @@ function Depositar() {
 
       {error && <p className="text-red-500 text-sm -mt-2">{error}</p>}
 
-      <button
-        onClick={() => {
-          // Função para enviar os dados do depósito
-          console.log("Depósito realizado.");
-          // Aqui você pode chamar o POST para /deposit, se necessário
-        }}
-        className="bg-teal-300 text-gray-900 text-4xl font-bold w-75 py-2 rounded-2xl hover:bg-teal-500 transition transform hover:scale-105 mt-6"
-      >
-        Confirmar Depósito
-      </button>
+      <div className="flex gap-4 mt-4 items-align-center justify-center">
+        <button
+          onClick={() => navigate(-1)}
+          className="bg-gray-700 text-white text-4xl font-bold w-75 py-5 rounded-2xl hover:bg-gray-600 transition transform hover:scale-105"
+        >
+          Voltar
+        </button>
+      
+        <button
+          onClick={() => {
+            // Função para enviar os dados do depósito
+            console.log("Depósito realizado.");
+            // Aqui você pode chamar o POST para /deposit, se necessário
+          }}
+          className="bg-teal-300 text-gray-900 text-4xl font-bold w-75 py-2 rounded-2xl hover:bg-teal-500 transition transform hover:scale-105 mt-6"
+        >
+          Confirmar Depósito
+        </button>
+      </div>
     </div>
   );
 }
