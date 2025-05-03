@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
+import { useSaldo } from "./SaldoContex";
 import { useNavigate } from "react-router-dom";
+import { useTransacoes } from "./TransacoesProvider";
 
 function Sacar() {
-  const [saldo, setSaldo] = useState(1020.00);
+  const {saldo, setSaldo} = useSaldo(); // Hook para acessar o saldo
+  const {addTransacao} = useTransacoes(); // Hook para acessar as transações
   const [quantidades, setQuantidades] = useState({
     2: 0,
     5: 0,
@@ -16,26 +19,6 @@ function Sacar() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  // Função para buscar o saldo atual (simulando com um mock)
-  const fetchSaldo = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("/mockConta.json"); // Mock local
-      if (!response.ok) throw new Error();
-      const data = await response.json();
-      setSaldo(data.saldo); // Atualiza o saldo
-      setError("");  // Limpa o erro
-    } catch {
-      setError("Erro ao carregar as informações.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSaldo(); // Carregar o saldo ao renderizar
-  }, []);
 
   // Função para calcular o valor total a ser sacado
   const calcularSaque = () => {
@@ -68,6 +51,15 @@ function Sacar() {
     
     // Se tudo estiver ok, realiza o saque
     setSaldo(prev => prev - valorSaque);
+
+    // Registra a transação
+    addTransacao({
+      tipo: "saque",
+      valor: valorSaque,
+      data: new Date().toISOString(),
+      saldoRestante: saldo - valorSaque
+    });
+    
     setSuccess(`Saque de R$ ${valorSaque.toFixed(2)} realizado com sucesso!`);
     setError("");
     

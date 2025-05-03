@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useTransacoes } from "./TransacoesProvider";
 import { useNavigate } from "react-router-dom";
 
 interface Transacao {
@@ -9,58 +9,9 @@ interface Transacao {
 }
 
 function Transacoes() {
-  const [transacoes, setTransacoes] = useState<Transacao[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+
+  const { transacoes } = useTransacoes();
   const navigate = useNavigate();
-
-  // Mock de transações (substituir por chamada à API)
-  const fetchTransacoes = async () => {
-    setLoading(true);
-    try {
-      // Simulando delay de rede
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Mock data - substituir por chamada real à API
-      const mockData: Transacao[] = [
-        {
-          tipo: "depósito",
-          valor: 500.00,
-          data: "2023-05-15T14:30:00",
-          saldoRestante: 1500.00
-        },
-        {
-          tipo: "saque",
-          valor: 200.00,
-          data: "2023-05-16T10:15:00",
-          saldoRestante: 1300.00
-        },
-        {
-          tipo: "depósito",
-          valor: 1000.00,
-          data: "2023-05-17T16:45:00",
-          saldoRestante: 2300.00
-        },
-        {
-          tipo: "saque",
-          valor: 300.00,
-          data: "2023-05-18T09:20:00",
-          saldoRestante: 2000.00
-        },
-      ];
-      
-      setTransacoes(mockData);
-      setError("");
-    } catch {
-      setError("Erro ao carregar o histórico de transações.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTransacoes();
-  }, []);
 
   const formatarData = (dataString: string) => {
     const data = new Date(dataString);
@@ -79,11 +30,7 @@ function Transacoes() {
         Histórico de Transações
       </h1>
 
-      {loading ? (
-        <div className="text-white text-2xl">Carregando...</div>
-      ) : error ? (
-        <div className="text-red-500 text-xl">{error}</div>
-      ) : transacoes.length === 0 ? (
+      {transacoes.length === 0 ? (
         <div className="text-white text-2xl">Nenhuma transação encontrada</div>
       ) : (
         <div className="w-full max-w-4xl space-y-6 mb-10">

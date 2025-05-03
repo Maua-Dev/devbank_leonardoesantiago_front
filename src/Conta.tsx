@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import { useSaldo } from "./SaldoContex"; // Hook para acessar o saldo
 import { useNavigate } from "react-router-dom";
 
 function Conta() {
-  const [saldo, setSaldo] = useState(0);
+  const {saldo, setSaldo} = useSaldo(); // Hook para acessar o saldo
   const [informacoesConta, setInformacoesConta] = useState<any>({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,7 +16,9 @@ function Conta() {
       const response = await fetch("/mockConta.json"); // Mock local
       if (!response.ok) throw new Error(); // Verifica se a resposta é válida
       const data = await response.json();
-      setSaldo(data.saldo); // Atualiza o saldo
+      if (saldo === 0) {
+        setSaldo(data.saldo); // Atualiza o saldo
+      }
       setInformacoesConta(data); // Atualiza as informações da conta
       setError("");  // Limpa o erro, se houver
     } catch {

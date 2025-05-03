@@ -1,8 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, } from "react";
+import { useSaldo } from "./SaldoContex";
 import { useNavigate } from "react-router-dom";
+import { useTransacoes } from './TransacoesProvider'; // Importe o hook useTransacoes
 
 function Depositar() {
-  const [saldo, setSaldo] = useState(0);
+  const {saldo, setSaldo} = useSaldo(); // Hook para acessar o saldo
+  const { addTransacao } = useTransacoes();
   const [quantidades, setQuantidades] = useState({
     2: 0,
     5: 0,
@@ -15,26 +18,6 @@ function Depositar() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  // Função para buscar o saldo atual (simulando com um mock)
-  const fetchSaldo = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("/mockConta.json"); // Mock local
-      if (!response.ok) throw new Error();
-      const data = await response.json();
-      setSaldo(data.saldo); // Atualiza o saldo
-      setError("");  // Limpa o erro
-    } catch {
-      setError("Erro ao carregar as informações.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSaldo(); // Carregar o saldo ao renderizar
-  }, []);
 
   // Função para calcular o valor total a ser depositado
   const calcularDeposito = () => {
@@ -99,9 +82,35 @@ function Depositar() {
       
         <button
           onClick={() => {
-            // Função para enviar os dados do depósito
-            console.log("Depósito realizado.");
-            // Aqui você pode chamar o POST para /deposit, se necessário
+            const valorDeposito = calcularDeposito();
+            if (valorDeposito <= 0) {
+              setError("Você precisa selecionar pelo menos uma nota.");
+              return;
+            }
+
+            const novoSaldo = saldo + valorDeposito; // calcula o novo saldo
+        
+            setSaldo((prevSaldo) => prevSaldo + valorDeposito);
+            setQuantidades({
+              2: 0,
+              5: 0,
+              10: 0,
+              20: 0,
+              50: 0,
+              100: 0,
+              200: 0,
+            });
+            setError("");
+        
+            // Aqui é onde você registra a transação:
+            addTransacao({
+              tipo: "depósito",
+              valor: valorDeposito,
+              data: new Date().toISOString(),
+              saldoRestante: novoSaldo
+            });
+        
+            console.log(`Depósito de R$${valorDeposito} realizado com sucesso!`);
           }}
           className="bg-teal-300 text-gray-900 text-4xl font-bold w-75 py-2 rounded-2xl hover:bg-teal-500 transition transform hover:scale-105 mt-6"
         >
