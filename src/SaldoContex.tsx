@@ -8,7 +8,7 @@ type SaldoContextType = {
 const SaldoContext = createContext<SaldoContextType | undefined>(undefined);
 
 export const SaldoProvider = ({children}: {children: ReactNode}) => {
-    const [saldo, setSaldo] = useState(1000); // Valor inicial do saldo, pode ser alterado conforme necessário
+    const [saldo, setSaldo] = useState(0); // Valor inicial do saldo, pode ser alterado conforme necessário
 
     return (
         <SaldoContext.Provider value={{ saldo, setSaldo }}>

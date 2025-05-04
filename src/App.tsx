@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useSaldo } from "./SaldoContex"; // Hook para acessar o saldo
+import { useInfosdaConta } from "./InfosdaConta"; // Hook para acessar as informações da conta
 
 function App() {
   const [apiUrl, setApiUrl] = useState("");
@@ -7,6 +10,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const validApi = "https://r2tcz6zsokynb72jb6o4ffd5nm0ryfyz.lambda-url.us-west-2.on.aws/"; // Essa é a UNICA api válida
   const navigate = useNavigate();
+  const { setSaldo } = useSaldo(); // Hook para acessar o saldo
+  const { setInformacoesConta } = useInfosdaConta(); // Hook para acessar as informações da conta
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => { // Atualiza o valor da URL da API
     setApiUrl(e.target.value);
@@ -27,8 +32,14 @@ function App() {
     setLoading(true);
     try {
       const formattedApiUrl = apiUrl.trim().replace(/\/$/, ""); // Remove a barra final, se houver
-      const response = await fetch(`${formattedApiUrl}/`); // Usa a URL sem a barra final, se não, não funciona
-      if (!response.ok) throw new Error();
+      // const response = await fetch("/mockConta.json"); // Mock local
+      const response = await axios.get(formattedApiUrl); // Mock local
+      if (!response.status) throw new Error(); // Verifica se a resposta é válida
+      console.log(response); // Loga a resposta
+      const data = await response.data;
+        setSaldo(data.current_balance); // Atualiza o saldo
+      setInformacoesConta(data); // Atualiza as informações da conta
+      setError(""); // Limpa o erro, se houver
       setError("");
       navigate("/conta"); // Redireciona para a próxima tela
     } catch {

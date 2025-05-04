@@ -1,36 +1,11 @@
-import { useState, useEffect } from "react";
 import { useSaldo } from "./SaldoContex"; // Hook para acessar o saldo
 import { useNavigate } from "react-router-dom";
+import { useInfosdaConta } from "./InfosdaConta";
 
 function Conta() {
-  const { saldo, setSaldo } = useSaldo(); // Hook para acessar o saldo
-  const [informacoesConta, setInformacoesConta] = useState<any>({});
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  // Função para buscar as informações da conta
-  const fetchConta = async () => {
-    setLoading(true); // Inicia o loading
-    try {
-      const response = await fetch("/mockConta.json"); // Mock local
-      if (!response.ok) throw new Error(); // Verifica se a resposta é válida
-      const data = await response.json();
-      if (saldo === 0) {
-        setSaldo(0); // Atualiza o saldo
-      }
-      setInformacoesConta(data); // Atualiza as informações da conta
-      setError(""); // Limpa o erro, se houver
-    } catch {
-      setError("Erro ao carregar as informações da conta."); // Erro ao carregar as informações
-    } finally {
-      setLoading(false); // Finaliza o loading
-    }
-  };
-
-  useEffect(() => {
-    fetchConta(); // Carregar as informações ao renderizar
-  }, []);
+  const {saldo} = useSaldo(); // Hook para acessar o saldo
+  const {informacoesConta} = useInfosdaConta(); // Hook para acessar as informações da conta
 
   // Funções para as ações do usuário
   const handleDepositar = () => {
@@ -57,17 +32,13 @@ function Conta() {
       </h1>
 
       {/* Informações da conta no canto superior direito */}
-      {!loading && informacoesConta && (
+      {informacoesConta && (
         <div className="bg-gray-800 border border-teal-300 rounded-2xl p-6 text-white absolute top-4 right-4 text-lg">
-          <p>Nome: {informacoesConta.nome}</p>
-          <p>Agência: {informacoesConta.agencia}</p>
-          <p>Conta: {informacoesConta.conta}</p>
+          <p>Nome: {informacoesConta.name}</p>
+          <p>Agência: {informacoesConta.agency}</p>
+          <p>Conta: {informacoesConta.account}</p>
         </div>
       )}
-
-      {loading ? (
-        <p className="text-white">Carregando...</p> // Mensagem de loading
-      ) : (
         <>
           <p className="bg-gray-800 border border-teal-300 rounded-2xl p-6 text-white text-3xl mb-5">
             {" "}
@@ -76,8 +47,6 @@ function Conta() {
               Saldo atual: R$ {saldo.toFixed(2)} {/* Saldo atual */}
             </span>
           </p>{" "}
-          {error && <p className="text-red-500 text-sm -mt-2">{error}</p>}{" "}
-          {/* Mensagem de erro */}
           <div className="flex gap-10">
             <button
               onClick={handleDepositar} // Navega para a página de depósito
@@ -99,7 +68,6 @@ function Conta() {
             </button>
           </div>
         </>
-      )}
     </div>
   );
 }
