@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSaldo } from "./SaldoContex";
 import { useNavigate } from "react-router-dom";
 import { useTransacoes } from "./TransacoesProvider";
 
 function Sacar() {
-  const {saldo, setSaldo} = useSaldo(); // Hook para acessar o saldo
-  const {addTransacao} = useTransacoes(); // Hook para acessar as transações
+  const { saldo, setSaldo } = useSaldo(); // Hook para acessar o saldo
+  const { addTransacao } = useTransacoes(); // Hook para acessar as transações
   const [quantidades, setQuantidades] = useState({
     2: 0,
     5: 0,
@@ -17,7 +17,6 @@ function Sacar() {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Função para calcular o valor total a ser sacado
@@ -29,7 +28,7 @@ function Sacar() {
 
   // Função para atualizar a quantidade de notas
   const handleQuantidadeChange = (nota: number, valor: number) => {
-    setQuantidades(prev => ({
+    setQuantidades((prev) => ({
       ...prev,
       [nota]: valor < 0 ? 0 : valor,
     }));
@@ -38,31 +37,31 @@ function Sacar() {
   // Função para confirmar o saque
   const handleConfirmarSaque = () => {
     const valorSaque = calcularSaque();
-    
+
     if (valorSaque <= 0) {
       setError("O valor do saque deve ser maior que zero.");
       return;
     }
-    
+
     if (valorSaque > saldo) {
       setError("Saldo insuficiente para realizar o saque.");
       return;
     }
-    
+
     // Se tudo estiver ok, realiza o saque
-    setSaldo(prev => prev - valorSaque);
+    setSaldo((prev: number) => prev - valorSaque);
 
     // Registra a transação
     addTransacao({
       tipo: "saque",
       valor: valorSaque,
       data: new Date().toISOString(),
-      saldoRestante: saldo - valorSaque
+      saldoRestante: saldo - valorSaque,
     });
-    
+
     setSuccess(`Saque de R$ ${valorSaque.toFixed(2)} realizado com sucesso!`);
     setError("");
-    
+
     // Aqui você pode adicionar a lógica para enviar os dados para o backend
     console.log("Saque realizado:", quantidades);
   };
@@ -83,21 +82,36 @@ function Sacar() {
       </div>
 
       <div className="text-white text-2xl">
-        {Object.keys(quantidades).map((nota) => (
-          <div key={nota} className="flex justify-between items-center mb-4">
-            <span>{`Notas de R$ ${nota}`}</span>
-            <input
-              type="number"
-              value={quantidades[nota]}
-              onChange={(e) =>
-                handleQuantidadeChange(Number(nota), Number(e.target.value))
-              }
-              className="text-gray-900 p-2 rounded w-20 text-center"
-              min="0"
-            />
-          </div>
-        ))}
+  {Object.keys(quantidades).map((nota) => (
+    <div key={nota} className="flex justify-between items-center mb-4 gap-4">
+      <span>{`R$ ${nota}.00`}</span>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() =>
+            handleQuantidadeChange(Number(nota), quantidades[nota] - 1)
+          }
+          className="bg-gray-800 border border-teal-300 text-red-500 font-bold text-center px-5 py-1 rounded text-xl w-14 ml-5 hover: transition transform hover:scale-120"
+        >
+          -
+        </button>
+        <input
+          type="text"
+          value={quantidades[nota]}
+          readOnly
+          className="text-gray-900 p-2 rounded w-5 text-center"
+        />
+        <button
+          onClick={() =>
+            handleQuantidadeChange(Number(nota), quantidades[nota] + 1)
+          }
+          className="bg-gray-800 border border-teal-300 text-green-500 font-bold px-5 py-1 rounded text-xl hover: transition transform hover:scale-120"
+        >
+          +
+        </button>
       </div>
+    </div>
+  ))}
+</div>
 
       <div className="bg-gray-800 border border-teal-300 rounded-2xl p-6 text-white text-3xl mt-6">
         <p>Total a sacar: R$ {calcularSaque().toFixed(2)}</p>
@@ -109,14 +123,14 @@ function Sacar() {
       <div className="flex gap-4 mt-4">
         <button
           onClick={() => navigate(-1)}
-          className="bg-gray-700 text-white text-2xl font-bold w-40 py-2 rounded-2xl hover:bg-gray-600 transition transform hover:scale-105"
+          className="bg-gray-700 text-white text-4xl font-bold w-75 py-4 rounded-2xl hover:gray-teal-600 transition transform hover:scale-105 mt-6"
         >
           Voltar
         </button>
-        
+
         <button
           onClick={handleConfirmarSaque}
-          className="bg-teal-300 text-gray-900 text-2xl font-bold w-40 py-2 rounded-2xl hover:bg-teal-500 transition transform hover:scale-105"
+          className="bg-teal-300 text-gray-900 text-4xl font-bold w-75 py-9 rounded-2xl hover:bg-teal-500 transition transform hover:scale-105 mt-6"
         >
           Confirmar Saque
         </button>

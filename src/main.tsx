@@ -7,7 +7,7 @@ import Depositar from './Depositar.tsx'
 import Sacar from './Sacar.tsx' // Importe o componente Sacar
 import Transacoes from './Transacoes.tsx' // Importe o componente Transacoes
 import {TransacoesProvider} from './TransacoesProvider.tsx' // Importe o TransacoesProvider
-import { SaldoProvider } from './SaldoContex.tsx' 
+import { SaldoProvider } from './SaldoContex.tsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
