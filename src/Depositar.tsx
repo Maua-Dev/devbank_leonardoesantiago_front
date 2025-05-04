@@ -3,10 +3,13 @@ import { useSaldo } from "./SaldoContex";
 import { useNavigate } from "react-router-dom";
 import { useTransacoes } from "./TransacoesProvider";
 
+export interface QuantidadeNotas {
+  [key: number]: number; // Mapeia o valor da nota para a quantidade
+}
 function Depositar() {
   const { saldo, setSaldo } = useSaldo(); // Hook para acessar o saldo
   const { addTransacao } = useTransacoes(); // Hook para acessar as transações
-  const [quantidades, setQuantidades] = useState({
+  const [quantidades, setQuantidades] = useState<QuantidadeNotas>({
     2: 0,
     5: 0,
     10: 0,
@@ -22,7 +25,7 @@ function Depositar() {
   // Função para calcular o valor total a ser depositado
   const calcularDeposito = () => {
     return Object.keys(quantidades).reduce((acc, key) => {
-      return acc + parseInt(key) * quantidades[key];
+      return acc + parseInt(key) * quantidades[Number(key)];
     }, 0);
   };
 
@@ -44,7 +47,7 @@ function Depositar() {
     }
 
     // Se tudo estiver ok, realiza o depósito
-    setSaldo((prev:number) => prev + valorDeposito);
+    setSaldo(saldo + valorDeposito);
 
     // Registra a transação
     addTransacao({
@@ -85,7 +88,7 @@ function Depositar() {
       <div className="flex items-center gap-2">
         <button
           onClick={() =>
-            handleQuantidadeChange(Number(nota), quantidades[nota] - 1)
+            handleQuantidadeChange(Number(nota), quantidades[Number(nota)] - 1)
           }
           className="bg-gray-800 border border-teal-300 text-red-500 font-bold text-center px-5 py-1 rounded text-xl w-14 ml-5 hover: transition transform hover:scale-120"
         >
@@ -93,13 +96,13 @@ function Depositar() {
         </button>
         <input
           type="text"
-          value={quantidades[nota]}
+          value={quantidades[Number(nota)]}
           readOnly
           className="text-gray-900 p-2 rounded w-5 text-center"
         />
         <button
           onClick={() =>
-            handleQuantidadeChange(Number(nota), quantidades[nota] + 1)
+            handleQuantidadeChange(Number(nota), quantidades[Number(nota)] + 1)
           }
           className="bg-gray-800 border border-teal-300 text-green-500 font-bold px-5 py-1 rounded text-xl hover: transition transform hover:scale-120"
         >
